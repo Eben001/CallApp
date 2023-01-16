@@ -1,37 +1,60 @@
 package com.ebenezer.gana.callapp
 
 import android.Manifest
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import java.util.*
 
-
+private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
     lateinit var textView: TextView
     private val DIAL_REQUEST_CODE = 12
+    lateinit var callButton: Button
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause: Called")
+    }
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop: Called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume: Called")
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         //Link the Id the of the button in xml
-        val callButton = findViewById<Button>(R.id.btnCall)
+        callButton = findViewById(R.id.btnCall)
         textView = findViewById(R.id.textView)
+
+
+
+
+
 
         callButton.setOnClickListener {
             checkPermission()
         }
     }
+
 
     private fun checkPermission() {
         if (ContextCompat.checkSelfPermission(
@@ -60,8 +83,35 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             // Permission has already been granted
+            //TODO: Launch the Intent to SecondActivity
             makeCall("+31231412151")
         }
+
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED){
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.READ_PHONE_STATE
+                )
+            ) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.READ_PHONE_STATE),
+                    10
+                )
+            }
+        } else {
+            // Permission has already been granted
+
+        }
+
     }
 
     override fun onRequestPermissionsResult(
@@ -79,7 +129,11 @@ class MainActivity : AppCompatActivity() {
                 // functionality
             }
             return
+        }else if(requestCode == 10){
+            return
         }
+
+
     }
 
     private fun makeCall(phone: String) {
@@ -87,6 +141,16 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
 
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        //this.unregisterReceiver(callReceiver)
+    }
+
+//    override fun onCallCompleted(text: String) {
+//        callButton.text = text
+//
+//    }
 
 
 }
