@@ -1,6 +1,7 @@
 package com.ebenezer.gana.callapp
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,6 +18,10 @@ import java.util.*
 
 private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
+
+    val REQUEST_CODE = 12
+    val DIAL_REQUEST_CODE = 12
+
 
     lateinit var textView: TextView
     lateinit var callButton: Button
@@ -47,106 +52,110 @@ class MainActivity : AppCompatActivity() {
 
         callButton.setOnClickListener {
             val intent = Intent(this, SecondActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, REQUEST_CODE)
         }
+
+
+
     }
 
-
-//    private fun checkPermission() {
-//        if (ContextCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.CALL_PHONE
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // You can start the phone call here
+            checkPermission()
+        }
+    }
 //
-//            // Permission is not granted
-//            // Should we show an explanation?
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(
-//                    this,
-//                    Manifest.permission.CALL_PHONE
-//                )
-//            ) {
-//                // Show an explanation to the user *asynchronously* -- don't block
-//                // this thread waiting for the user's response! After the user
-//                // sees the explanation, try again to request the permission.
-//            } else {
-//                // No explanation needed, we can request the permission.
-//                ActivityCompat.requestPermissions(
-//                    this,
-//                    arrayOf(Manifest.permission.CALL_PHONE),
-//                    DIAL_REQUEST_CODE
-//                )
-//            }
-//        } else {
-//            // Permission has already been granted
-//            //TODO: Launch the Intent to SecondActivity
-//            makeCall("+31231412151")
-//        }
-//
-//
-//        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED){
-//            // Permission is not granted
-//            // Should we show an explanation?
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(
-//                    this,
-//                    Manifest.permission.READ_PHONE_STATE
-//                )
-//            ) {
-//                // Show an explanation to the user *asynchronously* -- don't block
-//                // this thread waiting for the user's response! After the user
-//                // sees the explanation, try again to request the permission.
-//            } else {
-//                // No explanation needed, we can request the permission.
-//                ActivityCompat.requestPermissions(
-//                    this,
-//                    arrayOf(Manifest.permission.READ_PHONE_STATE),
-//                    10
-//                )
-//            }
-//        } else {
-//            // Permission has already been granted
-//
-//        }
-//
-//    }
-//
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<String>, grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        if (requestCode == DIAL_REQUEST_CODE) {
-//            // If request is cancelled, the result arrays are empty.
-//            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-//                // permission was granted, yay!
-//                makeCall("+31231412151")
-//            } else {
-//                // permission denied, boo! Disable the
-//                // functionality
-//            }
-//            return
-//        }else if(requestCode == 10){
-//            return
-//        }
-//
-//
-//    }
-//
-//    private fun makeCall(phone: String) {
-//        val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$phone"))
-//        startActivity(intent)
-//
-//    }
 
     override fun onDestroy() {
         super.onDestroy()
         //this.unregisterReceiver(callReceiver)
     }
 
-//    override fun onCallCompleted(text: String) {
-//        callButton.text = text
-//
-//    }
+    private fun checkPermission() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CALL_PHONE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.CALL_PHONE
+                )
+            ) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.CALL_PHONE),
+                    DIAL_REQUEST_CODE
+                )
+            }
+        } else {
+            // Permission has already been granted
+            makeCall("+31231412151")
+        }
+
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED){
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.READ_PHONE_STATE
+                )
+            ) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.READ_PHONE_STATE),
+                    10
+                )
+            }
+        } else {
+            // Permission has already been granted
+
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == DIAL_REQUEST_CODE) {
+            // If request is cancelled, the result arrays are empty.
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                // permission was granted, yay!
+                makeCall("+31231412151")
+            } else {
+                // permission denied, boo! Disable the
+                // functionality
+            }
+            return
+        }else if(requestCode == 10){
+            return
+        }
+
+
+    }
+
+    private fun makeCall(phone: String) {
+        val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$phone"))
+        startActivity(intent)
+    }
 
 
 }
